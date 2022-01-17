@@ -8,11 +8,11 @@ class RedisClient {
     this._is_alive = false;
     this.client.on('ready', () => { this._is_alive = true; });
     this.client.promise = Object.entries(redis.RedisClient.prototype)
-      .filter(([_, value]) => typeof value === 'function')
+      .filter((kv) => typeof kv[1] === 'function')
       .reduce((acc, [key, value]) => ({
-	...acc,
-	[key]: promisify(value).bind(this.client)
-      }), {})
+        ...acc,
+        [key]: promisify(value).bind(this.client),
+      }), {});
   }
 
   isAlive() { return this._is_alive; }
