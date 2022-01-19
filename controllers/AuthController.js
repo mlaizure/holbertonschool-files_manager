@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 import sha1 from 'sha1';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
@@ -19,7 +19,7 @@ class AuthController {
       response.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    const token = crypto.randomUUID();
+    const token = uuidv4();
     const key = `auth_${token}`;
     await redisClient.set(key, user._id, 24 * 60 * 60);
     response.status(200).json({ token });
