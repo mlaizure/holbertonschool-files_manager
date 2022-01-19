@@ -40,7 +40,7 @@ class UsersController {
     }
     const users = dbClient.database.collection('users');
     const user = await users.findOne({ _id: ObjectID(userId) });
-    response.status(200).json({ email: user.email, id: user._id });
+    response.status(200).json({ id: user._id, email: user.email });
   }
 }
 
