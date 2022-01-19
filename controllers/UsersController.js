@@ -1,5 +1,5 @@
-import crypto from 'crypto';
 import { ObjectID } from 'mongodb';
+import sha1 from 'sha1';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
@@ -22,10 +22,10 @@ class UsersController {
       response.status(400).json({ error: 'Missing password' });
       return;
     }
-    const sha1Hash = crypto.createHash('sha1');
+    /* const sha1Hash = crypto.createHash('sha1');
     sha1Hash.update(password);
-    const hashPass = sha1Hash.digest('hex');
-
+    const hashPass = sha1Hash.digest('hex'); */
+    const hashPass = sha1(password);
     const result = await users.insertOne({ email, password: hashPass });
     response.status(201).json({ id: result.insertedId, email });
   }

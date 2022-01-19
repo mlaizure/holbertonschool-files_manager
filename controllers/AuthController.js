@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import sha1 from 'sha1';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
@@ -8,10 +9,10 @@ class AuthController {
     const buff = Buffer.from(authHeader, 'base64');
     const [email, password] = buff.toString('ascii').split(':');
 
-    const sha1Hash = crypto.createHash('sha1');
+    /* const sha1Hash = crypto.createHash('sha1');
     sha1Hash.update(password);
-    const hashPass = sha1Hash.digest('hex');
-
+    const hashPass = sha1Hash.digest('hex'); */
+    const hashPass = sha1(password);
     const users = dbClient.database.collection('users');
     const user = await users.findOne({ email, password: hashPass });
     if (!user) {
