@@ -75,9 +75,6 @@ class FilesController {
       userId: ObjectID(userId),
       _id: ObjectID(request.params.id),
     });
-    console.log("fileInfo: ", fileInfo);
-    console.log('userId: ' + ObjectID(userId));
-    console.log('id: ' + ObjectID(request.params.id));
 
     if (!fileInfo) {
       response.status(404).json({ error: 'Not found' });
@@ -103,11 +100,11 @@ class FilesController {
     let { parentId } = request.query;
     parentId = parentId ? ObjectID(parentId) : '0';
     let { page } = request.query;
-    page = page ? parseInt(page) : 0;
+    page = page ? parseInt(page, 10) : 0;
     const files = dbClient.database.collection('files');
     const PAGE_SIZE = 20;
     const resultsArray = await files.aggregate([
-      { $match: { parentId, userId: ObjectID(userId) } },
+      { $match: { parentId } },
       { $skip: page * PAGE_SIZE },
       { $limit: PAGE_SIZE },
     ]).toArray();
