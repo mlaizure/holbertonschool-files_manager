@@ -27,33 +27,36 @@ class FilesController {
       response.status(400).json({ error: 'Missing type' });
     } else if (!data && type !== 'folder') {
       response.status(400).json({ error: 'Missing data' });
-    } else if (parentId && parentId !== 0) {
-      const parentFile = await files.findOne({ _id: ObjectID(parentId) });
-      if (!parentFile) {
-        response.status(400).json({ error: 'Parent not found' });
-      } else if (parentFile.type !== 'folder') {
-        response.status(400).json({ error: 'Parent is not a folder' });
-      } else {
-        if (!fs.existsSync(FOLDER_PATH)) fs.mkdirSync(FOLDER_PATH);
-        if (type === 'folder') {
-          const { insertedId } = await files.insertOne({
-            name, type, parentId, isPublic, userId,
-          });
-          response.status(201).json({
-            name, type, parentId, isPublic, userId, id: insertedId,
-          });
-        } else {
-          const token = uuidv4();
-          const buff = Buffer.from(data, 'base64');
-          const localPath = `${FOLDER_PATH}/${token}`;
-          fs.writeFileSync(localPath, buff, { encoding: 'binary' });
-          const { insertedId } = await files.insertOne({
-            name, type, parentId, isPublic, userId, localPath,
-          });
-          response.status(201).json({
-            name, type, parentId, isPublic, userId, id: insertedId,
-          });
+    } else {
+      if (parentId !== 0) {
+        const parentFile = await files.findOne({ _id: ObjectID(parentId) });
+        if (!parentFile) {
+          response.status(400).json({ error: 'Parent not found' });
+        } else if (parentFile.type !== 'folder') {
+          response.status(400).json({ error: 'Parent is not a folder' });
+          return;
         }
+      }
+
+      if (!fs.existsSync(FOLDER_PATH)) fs.mkdirSync(FOLDER_PATH);
+      if (type === 'folder') {
+        const { insertedId } = await files.insertOne({
+          name, type, parentId, isPublic, userId,
+        });
+        response.status(201).json({
+          name, type, parentId, isPublic, userId, id: insertedId,
+        });
+      } else {
+        const token = uuidv4();
+        const buff = Buffer.from(data, 'base64');
+        const localPath = `${FOLDER_PATH}/${token}`;
+        fs.writeFileSync(localPath, buff, { encoding: 'binary' });
+        const { insertedId } = await files.insertOne({
+          name, type, parentId, isPublic, userId, localPath,
+        });
+        response.status(201).json({
+          name, type, parentId, isPublic, userId, id: insertedId,
+        });
       }
     }
   }
