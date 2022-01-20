@@ -103,12 +103,21 @@ class FilesController {
     page = page ? parseInt(page, 10) : 0;
     const files = dbClient.database.collection('files');
     const PAGE_SIZE = 20;
-    const resultsArray = await files.aggregate([
-      { $match: { parentId } },
-      { $skip: page * PAGE_SIZE },
-      { $limit: PAGE_SIZE },
-    ]).toArray();
-    response.status(200).json(resultsArray);
+    if (parentId === '0') {
+      const resultsArray = await files.aggregate([
+        { $match: { userId: ObjectID(userId) } },
+        { $skip: page * PAGE_SIZE },
+        { $limit: PAGE_SIZE },
+      ]).toArray();
+      response.status(200).json(resultsArray);
+    } else {
+      const resultsArray = await files.aggregate([
+        { $match: { parentId } },
+        { $skip: page * PAGE_SIZE },
+        { $limit: PAGE_SIZE },
+      ]).toArray();
+      response.status(200).json(resultsArray);
+    }
   }
 }
 
