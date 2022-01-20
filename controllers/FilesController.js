@@ -19,8 +19,7 @@ class FilesController {
     const { name, type, data } = request.body;
     let { parentId, isPublic } = request.body;
     isPublic = !!isPublic;
-    parentId = parentId || '0';
-    console.log('parentId: "' + parentId + '"');
+    parentId = parentId || 0;
     const files = dbClient.database.collection('files');
     if (!name) {
       response.status(400).json({ error: 'Missing name' });
@@ -35,7 +34,6 @@ class FilesController {
       } else if (parentFile.type !== 'folder') {
         response.status(400).json({ error: 'Parent is not a folder' });
       } else {
-        console.log("Attempt to save file!");
         if (!fs.existsSync(FOLDER_PATH)) fs.mkdirSync(FOLDER_PATH);
         if (type === 'folder') {
           const { insertedId } = await files.insertOne({
@@ -48,9 +46,7 @@ class FilesController {
           const token = uuidv4();
           const buff = Buffer.from(data, 'base64');
           const localPath = `${FOLDER_PATH}/${token}`;
-          console.log("Before writeFileSync...");
           fs.writeFileSync(localPath, buff, { encoding: 'binary' });
-          console.log("After writeFileSync...");
           const { insertedId } = await files.insertOne({
             name, type, parentId, isPublic, userId, localPath,
           });
