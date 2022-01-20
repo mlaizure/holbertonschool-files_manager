@@ -109,7 +109,7 @@ class FilesController {
     const resultsArray = await files.aggregate([
       { $match: { parentId, userId: ObjectID(userId) } },
       { $skip: page * PAGE_SIZE },
-      { $limit: page * PAGE_SIZE + PAGE_SIZE },
+      { $limit: PAGE_SIZE },
     ]).toArray();
     response.status(200).json(resultsArray);
   }
