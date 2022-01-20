@@ -103,7 +103,7 @@ class FilesController {
     let { parentId } = request.query;
     parentId = parentId ? ObjectID(parentId) : '0';
     let { page } = request.query;
-    if (!page) page = 0;
+    page = page ? parseInt(page) : 0;
     const files = dbClient.database.collection('files');
     const PAGE_SIZE = 20;
     const resultsArray = await files.aggregate([
