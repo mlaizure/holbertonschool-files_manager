@@ -19,7 +19,7 @@ class FilesController {
     const { name, type, data } = request.body;
     let { parentId, isPublic } = request.body;
     isPublic = !!isPublic;
-    parentId = parentId || 0;
+    parentId = parentId || '0';
     const files = dbClient.database.collection('files');
     if (!name) {
       response.status(400).json({ error: 'Missing name' });
@@ -28,7 +28,7 @@ class FilesController {
     } else if (!data && type !== 'folder') {
       response.status(400).json({ error: 'Missing data' });
     } else {
-      if (parentId !== 0) {
+      if (parentId !== '0') {
         const parentFile = await files.findOne({ _id: ObjectID(parentId) });
         if (!parentFile) {
           response.status(400).json({ error: 'Parent not found' });
@@ -97,9 +97,9 @@ class FilesController {
     }
 
     let { parentId } = request.query;
-    parentId = parentId ? ObjectID(parentId) : 0;
+    parentId = parentId ? ObjectID(parentId) : '0';
     let { page } = request.query;
-    if (!page) page = 0;
+    if (!page) page = '0';
     const files = dbClient.database.collection('files');
     const PAGE_SIZE = 20;
     const resultsArray = await files.aggregate([
