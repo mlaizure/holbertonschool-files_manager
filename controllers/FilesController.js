@@ -1,4 +1,4 @@
-import * as mime from 'mime-types';
+import mime from 'mime-types';
 import { ObjectID } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
@@ -189,7 +189,7 @@ class FilesController {
     } else {
       const mimeType = mime.lookup(name);
       const data = fs.readFileSync(localPath);
-      response.status(200).setHeader('Content-Type', mimeType).end(data);
+      response.status(200).setHeader('Content-Type', mimeType).send(data);
     }
   }
 }
