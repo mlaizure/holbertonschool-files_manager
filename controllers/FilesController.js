@@ -171,11 +171,16 @@ class FilesController {
       _id: fileId,
     });
 
+    if (!fileInfo) {
+      response.status(404).json({ error: 'Not found' });
+      return;
+    }
+
     const {
       name, type, isPublic, userId, localPath,
     } = fileInfo;
 
-    if (!fileInfo || (userId.toString() !== activeUserId && !isPublic)) {
+    if (userId.toString() !== activeUserId && !isPublic) {
       response.status(404).json({ error: 'Not found' });
     } else if (type === 'folder') {
       response.status(400).json({ error: "A folder doesn't have content" });
