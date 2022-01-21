@@ -189,7 +189,7 @@ class FilesController {
     } else {
       const mimeType = mime.lookup(name);
       const data = fs.readFileSync(localPath);
-      response.status(200).setHeader('Content-Type', mimeType).send(data);
+      response.status(200).setHeader('Content-Type', mimeType).end(data);
     }
   }
 }
