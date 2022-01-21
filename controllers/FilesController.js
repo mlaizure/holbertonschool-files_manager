@@ -187,7 +187,7 @@ class FilesController {
     } else if (!fs.existsSync(localPath)) {
       response.status(404).json({ error: 'Not found' });
     } else {
-      const mimeType = mime.contentType(name);
+      const mimeType = mime.lookup(name);
       const data = fs.readFileSync(localPath);
       response.status(200).setHeader('Content-Type', mimeType).send(data);
     }
