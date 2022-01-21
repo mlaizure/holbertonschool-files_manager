@@ -180,7 +180,7 @@ class FilesController {
       name, type, isPublic, userId, localPath,
     } = fileInfo;
 
-    if (userId.toString() !== activeUserId && !isPublic) {
+    if (!isPublic && (!activeUserId || userId.toString() !== activeUserId)) {
       response.status(404).json({ error: 'Not found' });
     } else if (type === 'folder') {
       response.status(400).json({ error: "A folder doesn't have content" });
