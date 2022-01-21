@@ -161,36 +161,25 @@ class FilesController {
   }
 
   static async getFile(request, response) {
-    const token = request.header('X-Token');
-    const key = `auth_${token}`;
-    const activeUserId = await redisClient.get(key);
-
-    const fileId = request.params.id === '0' ? '0' : ObjectID(request.params.id);
-    const files = dbClient.database.collection('files');
-    const fileInfo = await files.findOne({
-      _id: fileId,
+    const token = request.headers['x-token'];
+    const userId = await redisClient.get(`auth_${token}`);
+    const { id } = request.params;
+    const objectId = new ObjectID(id);
+    const file = await dbClient.db.collection('files').findOne({
+      _id: objectId,
     });
 
-    if (!fileInfo) {
-      response.status(404).json({ error: 'Not found' });
-      return;
-    }
+    if (!file) return response.status(404).json({ error: 'Not found' });
+    if (!file.isPublic && (!userId || userId !== file.userId.toString())) return response.status(404).json({ error: 'Not found' });
+    if (file.type === 'folder') return response.status(400).json({ error: "A folder doesn't have content" });
+    if (!fs.existsSync(file.localPath)) return response.status(404).json({ error: 'Not found' });
 
-    const {
-      name, type, isPublic, userId, localPath,
-    } = fileInfo;
+    const mimeType = mime.lookup(file.name);
 
-    if (!isPublic && (!activeUserId || userId.toString() !== activeUserId)) {
-      response.status(404).json({ error: 'Not found' });
-    } else if (type === 'folder') {
-      response.status(400).json({ error: "A folder doesn't have content" });
-    } else if (!fs.existsSync(localPath)) {
-      response.status(404).json({ error: 'Not found' });
-    } else {
-      const mimeType = mime.lookup(name);
-      const data = fs.readFileSync(localPath);
-      response.status(200).setHeader('Content-Type', mimeType).send(data);
-    }
+    response.setHeader('content-type', mimeType);
+    const data = fs.readFileSync(file.localPath, 'utf-8');
+
+    return response.send(data);
   }
 }
 
